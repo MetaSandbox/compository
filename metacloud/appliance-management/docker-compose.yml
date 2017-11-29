@@ -2,27 +2,27 @@ version: '3.3'
 services:
   imagemaster-winterfell:
     image: misenko/imagemaster3000:latest
-    command: ["--certificate=/run/secrets/cert.pem",  "--key=/run/secrets/key.pem", "--endpoint=http://webserver/winterfell/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=winterfell", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-winterfell", "--group=metacloud", "--debug"]
+    command: ["--certificate=/run/secrets/imagemaster3000-cert.pem", "--key=/run/secrets/imagemaster3000-key.pem", "--endpoint=http://webserver/winterfell/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=winterfell", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-winterfell", "--group=metacloud", "--debug"]
     volumes:
-      - images-winterfell:/var/spool/imagemaster3000:Z
+      - imagemaster3000-images-winterfell:/var/spool/imagemaster3000:Z
     depends_on:
       - webserver
     secrets:
-      - cert.pem
-      - key.pem
+      - imagemaster3000-cert.pem
+      - imagemaster3000-key.pem
     deploy:
       restart_policy:
         condition: none
   imagemaster-kingslanding:
     image: misenko/imagemaster3000:latest
-    command: ["--certificate=/run/secrets/cert.pem",  "--key=/run/secrets/key.pem", "--endpoint=http://webserver/kingslanding/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=kingslanding", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-kingslanding", "--group=metacloud", "--debug"]
+    command: ["--certificate=/run/secrets/imagemaster3000-cert.pem", "--key=/run/secrets/imagemaster3000-key.pem", "--endpoint=http://webserver/kingslanding/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=kingslanding", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-kingslanding", "--group=metacloud", "--debug"]
     volumes:
-      - images-kingslanding:/var/spool/imagemaster3000:Z
+      - imagemaster3000-images-kingslanding:/var/spool/imagemaster3000:Z
     depends_on:
       - webserver
     secrets:
-      - cert.pem
-      - key.pem
+      - imagemaster3000-cert.pem
+      - imagemaster3000-key.pem
     deploy:
       restart_policy:
         condition: none
@@ -32,8 +32,8 @@ services:
       PGID: 999
       PUID: 999
     volumes:
-      - images-winterfell:/config/www/winterfell:ro
-      - images-kingslanding:/config/www/kingslanding:ro
+      - imagemaster3000-images-winterfell:/config/www/winterfell:ro
+      - imagemaster3000-images-kingslanding:/config/www/kingslanding:ro
   cloudkeeper-winterfell:
     image: cloudkeeper/cloudkeeper:latest
     command: ["--image-lists=http://webserver/winterfell/imagemaster3000.list", "--remote-mode", "--nginx-binary=/usr/sbin/nginx", "--nginx-ip-address=cloudkeeper-winterfell", "--nginx-proxy-ip-address=${PROXY_IP_ADDRESS}", "--nginx-proxy-port=50505", "--backend-endpoint=cloudkeeper-one-winterfell:50051", "--formats=qcow2", "--debug"]
@@ -48,11 +48,11 @@ services:
     image: cloudkeeper/cloudkeeper-one:latest
     command: ["--listen-address=0.0.0.0:50051", "--identifier=cloudkeeper-winterfell", "--opennebula-endpoint=${OPENNEBULA_ENDPOINT}", "--no-opennebula-secret", "--opennebula-datastores=winterfell", "--opennebula-allow-remote-source", "--appliances-template-dir=/templates", "--debug"]
     environment:
-      ONE_AUTH: /run/secrets/opennebula-test-auth
+      ONE_AUTH: /run/secrets/cloudkeeper-one-opennebula-auth
     volumes:
       - ${WINTERFELL_TEMPLATE_DIR}:/templates:ro
     secrets:
-      - opennebula-test-auth
+      - cloudkeeper-one-opennebula-auth
   cloudkeeper-kingslanding:
     image: cloudkeeper/cloudkeeper:latest
     command: ["--image-lists=http://webserver/kingslanding/imagemaster3000.list", "--remote-mode", "--nginx-binary=/usr/sbin/nginx", "--nginx-ip-address=cloudkeeper-kingslanding", "--nginx-proxy-ip-address=${PROXY_IP_ADDRESS}", "--nginx-proxy-port=60606", "--backend-endpoint=cloudkeeper-one-kingslanding:60061", "--formats=raw", "--debug"]
@@ -67,18 +67,18 @@ services:
     image: cloudkeeper/cloudkeeper-one:latest
     command: ["--listen-address=0.0.0.0:60061", "--identifier=cloudkeeper-kingslanding", "--opennebula-endpoint=${OPENNEBULA_ENDPOINT}", "--no-opennebula-secret", "--opennebula-datastores=kingslanding", "--opennebula-allow-remote-source", "--appliances-template-dir=/templates", "--debug"]
     environment:
-      ONE_AUTH: /run/secrets/opennebula-test-auth
+      ONE_AUTH: /run/secrets/cloudkeeper-one-opennebula-auth
     volumes:
       - ${KINGSLANDING_TEMPLATE_DIR}:/templates:ro
     secrets:
-      - opennebula-test-auth
+      - cloudkeeper-one-opennebula-auth
 volumes:
-  images-winterfell:
-  images-kingslanding:
+  imagemaster3000-images-winterfell:
+  imagemaster3000-images-kingslanding:
 secrets:
-  opennebula-test-auth:
+  cloudkeeper-one-opennebula-auth:
     external: true
-  cert.pem:
+  imagemaster3000-cert.pem:
     external: true
-  key.pem:
+  imagemaster3000-key.pem:
     external: true

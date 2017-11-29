@@ -1,28 +1,35 @@
 # compository - repository of Docker compose files
 
-Docker compose files for numerous MetaCloud services - both versions for local testing and Rancher deployment
+Docker compose files for numerous MetaCloud and FedCloud services
 
 ## Directory structure example
 ```bash
-─── service
-    ├── local
-    │   ├── docker-compose.yml
-    │   └── README.md
-    └── rancher
-        ├── devel
-        │   └── docker-compose.yml
-        └── production
-            └── docker-compose.yml
+├── fedcloud
+│   ├── service
+│   │   ├── docker-compose.yml
+│   │   ├── production.sh
+│   │   ├── development.sh
+│   │   └── README.md
+│   └── ...
+└── metacloud
+    ├── service
+    │   ├── docker-compose.yml
+    │   ├── production.sh
+    │   ├── development.sh
+    │   └── README.md
+    └── ...
 ```
 
-* **local** - directory containing docker-compose.yml for local run
-  * **README.md** - contains data about local deployment, mainly used environment variables, secrets and volumes
-* **rancher** - directory containing docker-compose.yml files optimized for run in Rancher (both devel and production versions)
+* **docker-compose.yml** - Docker compose for given service
+* **production.sh** - contains exports of environment variables for production environment
+* **development.sh** - contains exports of environment variables for development environment
+* **README.md** - contains data about deployment, mainly used environment variables, secrets and volumes
 
-## Local deployment example
+## Deployment example
 ### Deploy
 ```bash
-cd <service_name>/local
+cd metacloud/<service_name>
+source ./production.sh
 docker stack deploy -c docker-compose.yml <service_name>
 ```
 

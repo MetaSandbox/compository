@@ -1,9 +1,9 @@
 ## Environment variables
 
-* **OPENNEBULA_ENDPOINT** - OpenNebula RPC2 endpoint
-* **PROXY_IP_ADDRESS** - Proxy IP address to allow access to images for upload to OpenNebula
-* **WINTERFELL_TEMPLATE_DIR** - Directory to template.erb and image.erb for qcow2 (local datastores) appliances
-* **KINGSLANDING_TEMPLATE_DIR** - Directory to template.erb and image.erb for raw (ceph datastores) appliances
+* **COMPOSITORY_OPENNEBULA_ENDPOINT** - OpenNebula RPC2 endpoint
+* **COMPOSITORY_PROXY_IP_ADDRESS** - Proxy IP address to allow access to images for upload to OpenNebula
+* **COMPOSITORY_WINTERFELL_TEMPLATE_DIR** - Directory to template.erb and image.erb for qcow2 (local datastores) appliances
+* **COMPOSITORY_KINGSLANDING_TEMPLATE_DIR** - Directory to template.erb and image.erb for raw (ceph datastores) appliances
 
 ## Secrets
 * **cloudkeeper-one-opennebula-auth** - OpenNebula secret

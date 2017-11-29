@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   imagemaster-winterfell:
-    image: misenko/imagemaster3000:latest
+    image: misenko/imagemaster3000:${COMPOSITORY_IMAGEMASTER3000_VERSION}
     command: ["--certificate=/run/secrets/imagemaster3000-cert.pem", "--key=/run/secrets/imagemaster3000-key.pem", "--endpoint=http://webserver/winterfell/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=winterfell", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-winterfell", "--group=metacloud", "--debug"]
     volumes:
       - imagemaster3000-images-winterfell:/var/spool/imagemaster3000:Z
@@ -14,7 +14,7 @@ services:
       restart_policy:
         condition: none
   imagemaster-kingslanding:
-    image: misenko/imagemaster3000:latest
+    image: misenko/imagemaster3000:${COMPOSITORY_IMAGEMASTER3000_VERSION}
     command: ["--certificate=/run/secrets/imagemaster3000-cert.pem", "--key=/run/secrets/imagemaster3000-key.pem", "--endpoint=http://webserver/kingslanding/", "--definitions-repository=https://github.com/Misenko/imagemaster3000-definitions.git", "--definitions-branch=kingslanding", "--image-list-path=/var/spool/imagemaster3000/imagemaster3000.list", "--image-list-identifier=imagemaster3000-kingslanding", "--group=metacloud", "--debug"]
     volumes:
       - imagemaster3000-images-kingslanding:/var/spool/imagemaster3000:Z
@@ -27,7 +27,7 @@ services:
       restart_policy:
         condition: none
   webserver:
-    image: linuxserver/nginx
+    image: linuxserver/nginx:${COMPOSITORY_NGINX_VERSION}
     environment:
       PGID: 999
       PUID: 999
@@ -35,7 +35,7 @@ services:
       - imagemaster3000-images-winterfell:/config/www/winterfell:ro
       - imagemaster3000-images-kingslanding:/config/www/kingslanding:ro
   cloudkeeper-winterfell:
-    image: cloudkeeper/cloudkeeper:latest
+    image: cloudkeeper/cloudkeeper:${COMPOSITORY_CLOUDKEEPER_VERSION}
     command: ["--image-lists=http://webserver/winterfell/imagemaster3000.list", "--remote-mode", "--nginx-binary=/usr/sbin/nginx", "--nginx-ip-address=cloudkeeper-winterfell", "--nginx-proxy-ip-address=${COMPOSITORY_PROXY_IP_ADDRESS}", "--nginx-proxy-port=50505", "--backend-endpoint=cloudkeeper-one-winterfell:50051", "--formats=qcow2", "--debug"]
     ports:
       - "50505:50505"
@@ -45,7 +45,7 @@ services:
       restart_policy:
         condition: none
   cloudkeeper-one-winterfell:
-    image: cloudkeeper/cloudkeeper-one:latest
+    image: cloudkeeper/cloudkeeper-one:${COMPOSITORY_CLOUDKEEPER_ONE_VERSION}
     command: ["--listen-address=0.0.0.0:50051", "--identifier=cloudkeeper-winterfell", "--opennebula-endpoint=${COMPOSITORY_OPENNEBULA_ENDPOINT}", "--no-opennebula-secret", "--opennebula-datastores=winterfell", "--opennebula-allow-remote-source", "--appliances-template-dir=/templates", "--debug"]
     environment:
       ONE_AUTH: /run/secrets/cloudkeeper-one-opennebula-auth
@@ -54,7 +54,7 @@ services:
     secrets:
       - cloudkeeper-one-opennebula-auth
   cloudkeeper-kingslanding:
-    image: cloudkeeper/cloudkeeper:latest
+    image: cloudkeeper/cloudkeeper:${COMPOSITORY_CLOUDKEEPER_VERSION}
     command: ["--image-lists=http://webserver/kingslanding/imagemaster3000.list", "--remote-mode", "--nginx-binary=/usr/sbin/nginx", "--nginx-ip-address=cloudkeeper-kingslanding", "--nginx-proxy-ip-address=${COMPOSITORY_PROXY_IP_ADDRESS}", "--nginx-proxy-port=60606", "--backend-endpoint=cloudkeeper-one-kingslanding:60061", "--formats=raw", "--debug"]
     ports:
       - "60606:50505"
@@ -64,7 +64,7 @@ services:
       restart_policy:
         condition: none
   cloudkeeper-one-kingslanding:
-    image: cloudkeeper/cloudkeeper-one:latest
+    image: cloudkeeper/cloudkeeper-one:${COMPOSITORY_CLOUDKEEPER_ONE_VERSION}
     command: ["--listen-address=0.0.0.0:60061", "--identifier=cloudkeeper-kingslanding", "--opennebula-endpoint=${COMPOSITORY_OPENNEBULA_ENDPOINT}", "--no-opennebula-secret", "--opennebula-datastores=kingslanding", "--opennebula-allow-remote-source", "--appliances-template-dir=/templates", "--debug"]
     environment:
       ONE_AUTH: /run/secrets/cloudkeeper-one-opennebula-auth

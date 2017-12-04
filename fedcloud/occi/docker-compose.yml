@@ -1,0 +1,90 @@
+version: '3.3'
+services:
+  keystorm:
+    image: therocciproject/keystorm:${COMPOSITORY_KEYSTORM_VERSION}
+    command: ["-e",  "production"]
+    environment:
+      HOST: 0.0.0.0
+      ONE_AUTH: /run/secrets/keystorm-opennebula-auth
+      KEYSTORM_OPENNEBULA_ENDPOINT: ${COMPOSITORY_OPENNEBULA_ENDPOINT}
+      KEYSTORM_MEMCACHE: memcached:11211
+      KEYSTORM_TOKEN_CIPHER_FILE: /run/secrets/keystorm-token-cipher
+      KEYSTORM_TOKEN_KEY_FILE: /run/secrets/keystorm-token-key
+      KEYSTORM_TOKEN_IV_FILE: /run/secrets/keystorm-token-iv
+      KEYSTORM_BEHIND_PROXY: "true"
+      KEYSTORM_ENDPOINT: https://127.0.0.1:5000/
+      RAILS_LOG_TO_STDOUT: "yes"
+    depends_on:
+      - memcached
+    secrets:
+      - keystorm-opennebula-auth
+      - keystorm-token-cipher
+      - keystorm-token-key
+      - keystorm-token-iv
+  apache:
+    image: therocciproject/apache-occi:${COMPOSITORY_APACHE_OCCI_VERSION}
+    ports:
+      - "5000:5000"
+    environment:
+      APACHE_HOST: "*"
+      APACHE_PORT: 5000
+      APACHE_LOG_ERROR: /dev/stderr
+      APACHE_LOG_ACCESS: /dev/stdout
+      APACHE_PROXY: http://keystorm:3000
+      APACHE_OIDC_METADATA_URL: ${COMPOSITORY_OIDC_METADATA_URL}
+      APACHE_OIDC_CLIENT_ID: ${COMPOSITORY_OIDC_CLIENT_ID}
+      APACHE_OIDC_INTROSPECTION_ENDPOINT: ${COMPOSITORY_OIDC_INTROSPECTION_ENDPOINT}
+      APACHE_OIDC_REDIRECT_URI: http://apache/v3/auth/OS-FEDERATION/websso/oidc/redirect
+      APACHE_OIDC_REDIRECT_LOCATION: /v3/auth/OS-FEDERATION/websso/oidc/redirect
+      VOMS_CONFIGURATION: ${COMPOSITORY_VOMS_CONFIGURATION}
+      APACHE_OIDC_CLIENT_SECRET_FILE: /run/secrets/apache-oidc-client-secret
+      APACHE_OIDC_CRYPTO_PASSPHRASE_FILE: /run/secrets/apache-oidc-crypto-passphrase
+    secrets:
+      - oidc-client-secret
+      - oidc-crypto-passphrase
+    depends_on:
+      - keystorm
+  memcached:
+    image: memcached:latest
+  rocci:
+    image: therocciproject/rocci-server:${COMPOSITORY_ROCCI_SERVER_VERSION}
+    command: ["-e",  "production"]
+    environment:
+      HOST: 0.0.0.0
+      ROCCI_SERVER_KEYSTONE_URI: https://127.0.0.1:5000/
+      ROCCI_SERVER_MEMCACHE: memcached:11211
+      ROCCI_SERVER_BACKEND: opennebula
+      ROCCI_SERVER_OPENNEBULA_ENDPOINT: ${COMPOSITORY_OPENNEBULA_ENDPOINT}
+      ROCCI_SERVER_ENCRYPTION_TOKEN_CIPHER_FILE: /run/secrets/rocci-token-cipher
+      ROCCI_SERVER_ENCRYPTION_TOKEN_KEY_FILE: /run/secrets/rocci-token-key
+      ROCCI_SERVER_ENCRYPTION_TOKEN_IV_FILE: /run/secrets/rocci-token-iv
+      RAILS_LOG_TO_STDOUT: "yes"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - memcached
+      - keystorm
+    secrets:
+      - rocci-token-cipher
+      - rocci-token-key
+      - rocci-token-iv
+
+secrets:
+  apache-oidc-client-secret:
+    external: true
+  apache-oidc-crypto-passphrase:
+    external: true
+  keystorm-opennebula-auth:
+    external: true
+  keystorm-token-cipher:
+    external: true
+  keystorm-token-key:
+    external: true
+  keystorm-token-iv:
+    external: true
+  rocci-token-cipher:
+    external: true
+  rocci-token-key:
+    external: true
+  rocci-token-iv:
+    external: true

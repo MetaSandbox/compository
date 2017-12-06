@@ -12,7 +12,7 @@ services:
       KEYSTORM_TOKEN_KEY_FILE: /run/secrets/keystorm-token-key
       KEYSTORM_TOKEN_IV_FILE: /run/secrets/keystorm-token-iv
       KEYSTORM_BEHIND_PROXY: "true"
-      KEYSTORM_ENDPOINT: https://127.0.0.1:5000/
+      KEYSTORM_ENDPOINT: ${COMPOSITORY_KEYSTORM_ENDPOINT}
       RAILS_LOG_TO_STDOUT: "yes"
     depends_on:
       - memcached
@@ -35,7 +35,6 @@ services:
       APACHE_OIDC_CLIENT_ID: ${COMPOSITORY_OIDC_CLIENT_ID}
       APACHE_OIDC_INTROSPECTION_ENDPOINT: ${COMPOSITORY_OIDC_INTROSPECTION_ENDPOINT}
       APACHE_OIDC_REDIRECT_URI: http://apache/v3/auth/OS-FEDERATION/websso/oidc/redirect
-      APACHE_OIDC_REDIRECT_LOCATION: /v3/auth/OS-FEDERATION/websso/oidc/redirect
       VOMS_CONFIGURATION: ${COMPOSITORY_VOMS_CONFIGURATION}
       APACHE_OIDC_CLIENT_SECRET_FILE: /run/secrets/apache-oidc-client-secret
       APACHE_OIDC_CRYPTO_PASSPHRASE_FILE: /run/secrets/apache-oidc-crypto-passphrase
@@ -51,7 +50,7 @@ services:
     command: ["-e",  "production"]
     environment:
       HOST: 0.0.0.0
-      ROCCI_SERVER_KEYSTONE_URI: https://127.0.0.1:5000/
+      ROCCI_SERVER_KEYSTONE_URI: ${COMPOSITORY_KEYSTORM_ENDPOINT}
       ROCCI_SERVER_MEMCACHE: memcached:11211
       ROCCI_SERVER_BACKEND: opennebula
       ROCCI_SERVER_OPENNEBULA_ENDPOINT: ${COMPOSITORY_OPENNEBULA_ENDPOINT}

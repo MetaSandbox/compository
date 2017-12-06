@@ -3,6 +3,7 @@
 * **COMPOSITORY_APACHE_OCCI_VERSION** - Version of `therocciproject/apache-occi` Docker image
 * **COMPOSITORY_ROCCI_SERVER_VERSION** - Version of `therocciproject/rocci-server` Docker image
 * **COMPOSITORY_OPENNEBULA_ENDPOINT** - OpenNebula RPC2 endpoint
+* **COMPOSITORY_KEYSTORM_ENDPOINT** - Keystorm endpoint
 * **COMPOSITORY_OIDC_METADATA_URL** - OIDC provider configuration endpoint
 * **COMPOSITORY_OIDC_CLIENT_ID** - OIDC client ID
 * **COMPOSITORY_OIDC_INTROSPECTION_ENDPOINT** - OIDC introspection endpoint

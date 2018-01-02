@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  cloudkeeper:
+    image: cloudkeeper/cloudkeeper:${COMPOSITORY_CLOUDKEEPER_VERSION}
+    command: ["--image-lists-file=/run/secrets/cloudkeeper-one-opennebula-auth", "--nginx-binary=/usr/sbin/nginx", "--remote-mode", "--nginx-ip-address=cloudkeeper", "--nginx-proxy-ip-address=${COMPOSITORY_CLOUDKEEPER_PROXY_ADDRESS}", "--nginx-proxy-port=50505", "--backend-endpoint=cloudkeeper-one:50051", "--formats=qcow2"]
+    ports:
+      - "50505:50505"
+    depends_on:
+      - cloudkeeper-one
+    secrets:
+      - cloudkeeper-image-lists-file
+    deploy:
+      restart_policy:
+        condition: none
+  cloudkeeper-one:
+    image: cloudkeeper/cloudkeeper-one:${COMPOSITORY_CLOUDKEEPER_ONE_VERSION}
+    command: ["--listen-address=0.0.0.0:50051", "--identifier=cloudkeeper", "--appliances-template-dir=/templates" "--opennebula-endpoint=${COMPOSITORY_CLOUDKEEPER_ONE_OPENNEBULA_ENDPOINT}", "--no-opennebula-secret", "--opennebula-datastores=${COMPOSITORY_CLOUDKEEPER_ONE_OPENNEBULA_DATASTORES}", "--opennebula-allow-remote-source",]
+    environment:
+      ONE_AUTH: /run/secrets/cloudkeeper-one-opennebula-auth
+    volumes:
+      - ${COMPOSITORY_CLOUDKEEPER_ONE_TEMPLATE_DIR}:/templates:ro
+secrets:
+  cloudkeeper-image-lists-file:
+    external: true
+  cloudkeeper-one-opennebula-auth:
+    external: true
